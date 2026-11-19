@@ -86,11 +86,11 @@ class SearchEngine(private val context: Context) {
                     results.add(Result(
                         "sc_${sc.id}",
                         sc.shortLabel?.toString() ?: sc.id,
-                        sc.packageName,
+                        sc.activity?.packageName ?: "",
                         Type.SHORTCUT,
                         score - 5
                     ) {
-                        launcherApps.startShortcut(sc.packageName, sc.id, null, null, profile)
+                        launcherApps.startShortcut(sc.activity?.packageName ?: "", sc.id, null, null, profile)
                     })
                 }
             }
