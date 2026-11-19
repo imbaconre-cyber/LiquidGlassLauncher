@@ -54,9 +54,10 @@ class SearchEngine(private val context: Context) {
             }
         } catch (_: Exception) { }
 
+        val profiles = userManager.userProfiles ?: emptyList()
         // Apps
-        for (profile in userManager.userProfiles) {
-            val activities = launcherApps.getActivityList(null, profile)
+        for (profile in profiles) {
+            val activities = launcherApps.getActivityList(null, profile) ?: emptyList()
             for (info in activities) {
                 val label = info.label.toString()
                 val score = fuzzyScore(label, query)
@@ -77,8 +78,8 @@ class SearchEngine(private val context: Context) {
         // Shortcuts
         val sq = LauncherApps.ShortcutQuery()
         sq.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED)
-        for (profile in userManager.userProfiles) {
-            val shortcuts = launcherApps.getShortcuts(sq, profile)
+        for (profile in profiles) {
+            val shortcuts = launcherApps.getShortcuts(sq, profile) ?: emptyList()
             for (sc in shortcuts) {
                 val score = fuzzyScore(sc.shortLabel?.toString() ?: sc.id, query)
                 if (score > 0) {

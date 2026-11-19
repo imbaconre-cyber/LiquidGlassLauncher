@@ -12,6 +12,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kyant.backdrop.Backdrop
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.blur
+import com.kyant.backdrop.effects.lens
+import com.kyant.backdrop.effects.vibrancy
 
 @Composable
 fun GlassSurface(
@@ -22,10 +26,20 @@ fun GlassSurface(
     tint: Color = Color.White.copy(alpha = 0.35f),
     content: @Composable () -> Unit
 ) {
-    val mode = remember { GlassCapability.detect(LocalContext.current) }
+    val context = LocalContext.current
+    val mode = remember { GlassCapability.detect(context) }
     val base = modifier.clip(shape)
     val glassModifier = when (mode) {
-        GlassCapability.Mode.FULL -> base.liquidGlass(backdrop = backdrop, shape = shape, blurRadius = blurRadius, tint = tint)
+        GlassCapability.Mode.FULL -> base.drawBackdrop(
+            backdrop = backdrop,
+            shape = { shape },
+            effects = {
+                vibrancy()
+                blur(blurRadius.toPx())
+                lens(16.dp.toPx(), 32.dp.toPx(), true)
+            },
+            onDrawSurface = { drawRect(tint) }
+        )
         GlassCapability.Mode.FROSTED -> base.background(tint.copy(alpha = 0.55f))
         GlassCapability.Mode.SOLID -> base.background(tint.copy(alpha = 0.85f))
     }
