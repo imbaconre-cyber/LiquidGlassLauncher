@@ -9,20 +9,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.room.Room
+import com.liquidglass.launcher.data.db.LauncherDatabase
 import com.liquidglass.launcher.ui.LiquidGlassLauncherTheme
 import com.liquidglass.launcher.ui.home.HomeScreen
-import dagger.hilt.android.AndroidEntryPoint
+import com.liquidglass.launcher.ui.home.HomeViewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        val db = Room.databaseBuilder(applicationContext, LauncherDatabase::class.java, "launcher.db")
+            .fallbackToDestructiveMigration()
+            .build()
+        val viewModel = HomeViewModel(applicationContext, db.workspaceDao())
         setContent {
             LiquidGlassLauncherTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    HomeScreen()
+                    HomeScreen(viewModel = viewModel)
                 }
             }
         }

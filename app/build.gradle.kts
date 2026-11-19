@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
 }
 
 android {
@@ -65,9 +64,6 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.backdrop.android)
     implementation(libs.coil.compose)
