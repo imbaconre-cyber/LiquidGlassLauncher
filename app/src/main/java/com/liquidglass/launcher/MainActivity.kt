@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.room.Room
 import com.liquidglass.launcher.data.db.LauncherDatabase
-import com.liquidglass.launcher.ui.LiquidGlassLauncherTheme
+import com.liquidglass.launcher.ui.theme.LiquidGlassLauncherTheme
 import com.liquidglass.launcher.ui.home.HomeScreen
 import com.liquidglass.launcher.ui.home.HomeViewModel
 
@@ -23,7 +23,14 @@ class MainActivity : ComponentActivity() {
         val db = Room.databaseBuilder(applicationContext, LauncherDatabase::class.java, "launcher.db")
             .fallbackToDestructiveMigration()
             .build()
-        val viewModel = HomeViewModel(applicationContext, db.workspaceDao())
+        val viewModel = HomeViewModel(
+            applicationContext,
+            db.workspaceDao(),
+            db.folderDao(),
+            db.folderItemDao(),
+            db.iconOverrideDao(),
+            db.homeItemDao()
+        )
         setContent {
             LiquidGlassLauncherTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {

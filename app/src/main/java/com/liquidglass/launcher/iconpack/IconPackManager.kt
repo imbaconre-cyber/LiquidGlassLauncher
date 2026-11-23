@@ -1,11 +1,12 @@
 package com.liquidglass.launcher.iconpack
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.InputStream
@@ -14,15 +15,40 @@ class IconPackManager(private val context: Context) {
     data class IconPack(val packageName: String, val label: String)
     data class IconMapping(val component: String, val drawableName: String)
 
+    // Standard intent actions used by third-party icon packs to advertise themselves.
+    private val THEME_INTENT_ACTIONS = listOf(
+        "com.novalauncher.THEME",
+        "org.adw.launcher.THEMES",
+        "com.htc.launcher.action.THEME_CHANGED",
+        "com.gau.go.launcherex.theme",
+        "com.teslacoilsw.launcher.THEME"
+    )
+
+    /**
+     * Discovers installed icon packs by querying the standard theme intents.
+     */
     fun listIconPacks(): List<IconPack> {
         val pm = context.packageManager
-        val intent = android.content.Intent("com.novalauncher.THEME")
-        val resolveInfos = pm.queryIntentActivities(intent, PackageManager.GET_META_DATA)
-        return resolveInfos.map { ri ->
-            IconPack(ri.activityInfo.packageName, ri.loadLabel(pm).toString())
-        }.distinctBy { it.packageName }
+        val packs = mutableMapOf<String, IconPack>()
+        for (action in THEME_INTENT_ACTIONS) {
+            val intent = Intent(action)
+            val resolveInfos = pm.queryIntentActivities(intent, PackageManager.GET_META_DATA)
+            for (ri in resolveInfos) {
+                val pkg = ri.activityInfo.packageName
+                if (pkg.isNotBlank() && !packs.containsKey(pkg)) {
+                    packs[pkg] = IconPack(pkg, ri.loadLabel(pm).toString())
+                }
+            }
+        }
+        return packs.values.toList()
     }
 
+    fun isIconPackInstalled(packageName: String): Boolean =
+        listIconPacks().any { it.packageName == packageName }
+
+    /**
+     * Reads an icon pack's appfilter.xml and returns component -> drawable-name mappings.
+     */
     fun loadMappings(iconPackPackage: String): Map<String, String> {
         val pm = context.packageManager
         val appInfo = try { pm.getApplicationInfo(iconPackPackage, 0) } catch (e: Exception) { return emptyMap() }
@@ -44,7 +70,7 @@ class IconPackManager(private val context: Context) {
                 event = parser.next()
             }
         } catch (e: Exception) {
-            // ignore
+            // ignore malformed packs
         }
         return map
     }
@@ -56,5 +82,18 @@ class IconPackManager(private val context: Context) {
         val id = res.getIdentifier(drawableName, "drawable", iconPackPackage)
         if (id == 0) return null
         return try { res.getDrawable(id, null) } catch (e: Exception) { null }
+    }
+
+    /**
+     * Loads a custom icon from a content URI (used for per-app custom icon overrides).
+     */
+    fun getIconFromUri(uriString: String): Drawable? {
+        return try {
+            Uri.parse(uriString).let { uri ->
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    BitmapFactory.decodeStream(stream)
+                }?.let { BitmapDrawable(context.resources, it) }
+            }
+        } catch (e: Exception) { null }
     }
 }

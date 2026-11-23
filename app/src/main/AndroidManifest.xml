@@ -46,6 +46,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title" />
+
         <receiver
             android:name=".widget.LiquidGlassAppWidgetHost"
             android:exported="false" />

@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Liquid Glass Launcher</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Liquid Glass Settings</string>
+    <string name="section_home_grid">Home Screen Grid</string>
+    <string name="section_dock">Dock</string>
+    <string name="section_appearance">Appearance</string>
+
+    <string name="label_columns">Columns</string>
+    <string name="label_rows">Rows</string>
+    <string name="label_icon_size">Icon Size</string>
+    <string name="label_dock_size">Dock Icons</string>
+    <string name="label_page_count">Pages</string>
+    <string name="label_show_labels">Show Icon Labels</string>
+    <string name="label_dock_enabled">Enable Dock</string>
+
+    <string name="label_icon_pack">Icon Pack</string>
+    <string name="label_none">None</string>
+    <string name="label_icon_shape">Icon Shape</string>
+    <string name="label_shape_circle">Circle</string>
+    <string name="label_shape_rounded_square">Rounded Square</string>
+    <string name="label_shape_squircle">Squircle</string>
 </resources>
