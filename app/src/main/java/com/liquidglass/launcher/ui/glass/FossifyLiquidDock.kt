@@ -33,7 +33,7 @@ import com.liquidglass.launcher.ui.home.AppInfo
 fun FossifyLiquidDock(
     backdrop: Backdrop,
     apps: List<AppInfo>,
-    iconFor: (AppInfo) -> ImageBitmap?,
+    iconFor: @Composable (AppInfo) -> ImageBitmap?,
     onAppClick: (AppInfo) -> Unit,
     onAppLongPress: ((AppInfo) -> Unit)? = null,
     modifier: Modifier = Modifier,
@@ -72,7 +72,7 @@ fun FossifyLiquidDock(
 private fun FossifyLiquidDockItem(
     backdrop: Backdrop,
     app: AppInfo,
-    iconFor: (AppInfo) -> ImageBitmap?,
+    iconFor: @Composable (AppInfo) -> ImageBitmap?,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)?,
     iconSize: Dp,

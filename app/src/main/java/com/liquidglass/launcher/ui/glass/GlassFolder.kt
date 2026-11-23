@@ -28,7 +28,7 @@ import com.liquidglass.launcher.ui.home.AppInfo
 fun GlassFolder(
     backdrop: Backdrop,
     apps: List<AppInfo>,
-    iconFor: (AppInfo) -> ImageBitmap?,
+    iconFor: @Composable (AppInfo) -> ImageBitmap?,
     onAppClick: (AppInfo) -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 120.dp,

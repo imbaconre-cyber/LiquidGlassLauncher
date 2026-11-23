@@ -43,6 +43,7 @@ import com.liquidglass.launcher.ui.glass.FossifyLiquidDock
 import com.liquidglass.launcher.ui.glass.GlassFolder
 import com.liquidglass.launcher.ui.glass.GlassSurface
 import com.liquidglass.launcher.ui.glass.IconShape
+import com.liquidglass.launcher.ui.glass.toShape
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -153,7 +154,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     // Fill remaining cells of the page so the last row aligns.
                     val remainder = cellsPerPage - (pageItems.size % cellsPerPage)
                     if (remainder > 0 && remainder < cellsPerPage) {
-                        repeat(remainder) { Box(modifier = Modifier.size(iconSize)) }
+                        items(remainder) { Box(modifier = Modifier.size(iconSize)) }
                     }
                 }
             }

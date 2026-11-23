@@ -66,7 +66,7 @@ fun FossifyLiquidSlider(
     val onValueChangeFinishedState = rememberUpdatedState(onValueChangeFinished)
 
     fun mapValueToPx(v: Float, width: Float): Float {
-        val fraction = ((v - valueRange.start) / (valueRange.end - valueRange.start)).coerceIn(0f, 1f)
+        val fraction = ((v - valueRange.start) / (valueRange.endInclusive - valueRange.start)).coerceIn(0f, 1f)
         val span = (width - 2 * halfThumb).coerceAtLeast(0f)
         return halfThumb + fraction * span
     }
@@ -74,7 +74,7 @@ fun FossifyLiquidSlider(
     fun mapPxToValue(px: Float, width: Float): Float {
         val span = (width - 2 * halfThumb).coerceAtLeast(1f)
         val fraction = ((px - halfThumb) / span).coerceIn(0f, 1f)
-        return valueRange.start + fraction * (valueRange.end - valueRange.start)
+        return valueRange.start + fraction * (valueRange.endInclusive - valueRange.start)
     }
 
     // Snap thumb to external value changes (e.g. coming back from settings).
@@ -115,7 +115,7 @@ fun FossifyLiquidSlider(
                 thumbOffset.value = mapValueToPx(value, size.width.toFloat())
             }
     ) {
-        val fraction = ((value - valueRange.start) / (valueRange.end - valueRange.start)).coerceIn(0f, 1f)
+        val fraction = ((value - valueRange.start) / (valueRange.endInclusive - valueRange.start)).coerceIn(0f, 1f)
         val width = trackWidth.value
         val activeWidth = (width * fraction).coerceAtLeast(0f)
 
@@ -125,7 +125,7 @@ fun FossifyLiquidSlider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(trackHeight)
-                    .align(Alignment.CenterVertically)
+                    .align(Alignment.Center)
                     .drawBackdrop(
                         backdrop = backdrop,
                         shape = { RoundedCornerShape(trackHeight) },
@@ -142,7 +142,7 @@ fun FossifyLiquidSlider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(trackHeight)
-                    .align(Alignment.CenterVertically)
+                    .align(Alignment.Center)
                     .background(trackColor, RoundedCornerShape(trackHeight))
             )
         }
@@ -152,7 +152,7 @@ fun FossifyLiquidSlider(
             modifier = Modifier
                 .width(with(density) { activeWidth.toDp() })
                 .height(activeTrackHeight)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterStart)
                 .background(activeTrackColor, RoundedCornerShape(activeTrackHeight))
         )
 
@@ -161,6 +161,7 @@ fun FossifyLiquidSlider(
             modifier = Modifier
                 .size(thumbSize)
                 .offset(x = with(density) { (thumbOffset.value - halfThumb).toDp() }, y = 0.dp)
+                .align(Alignment.CenterStart)
                 .background(thumbColor, CircleShape)
                 .clip(CircleShape)
         )
