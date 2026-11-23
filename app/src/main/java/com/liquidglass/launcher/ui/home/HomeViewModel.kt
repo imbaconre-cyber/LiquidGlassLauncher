@@ -23,6 +23,7 @@ import com.liquidglass.launcher.settings.LauncherSettings
 import com.liquidglass.launcher.ui.glass.IconShape
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -78,17 +79,32 @@ class HomeViewModel(
      * plus icon pack & shape. Sourced from DataStore (the settings UI writes here), so changes
      * are reflected live in the home screen.
      */
-    val config: StateFlow<LauncherConfig> = combine(
+    private val gridSettings: Flow<Triple<Int, Int, Float>> = combine(
         settings.homeColumnsFlow,
         settings.homeRowsFlow,
-        settings.iconScaleFlow,
+        settings.iconScaleFlow
+    ) { columns, rows, scale -> Triple(columns, rows, scale) }
+
+    private val dockSettings: Flow<Triple<Int, Int, Boolean>> = combine(
         settings.dockSizeFlow,
         settings.pageCountFlow,
+        settings.dockEnabledFlow
+    ) { dockSize, pageCount, dockEnabled -> Triple(dockSize, pageCount, dockEnabled) }
+
+    private val appearanceSettings: Flow<Triple<Boolean, String?, String>> = combine(
         settings.showLabelsFlow,
-        settings.dockEnabledFlow,
         selectedIconPack,
         iconShape
-    ) { columns, rows, iconScale, dockSize, pageCount, showLabels, dockEnabled, pack, shape ->
+    ) { showLabels, pack, shape -> Triple(showLabels, pack, shape) }
+
+    val config: StateFlow<LauncherConfig> = combine(
+        gridSettings,
+        dockSettings,
+        appearanceSettings
+    ) { grid, dock, appearance ->
+        val (columns, rows, iconScale) = grid
+        val (dockSize, pageCount, dockEnabled) = dock
+        val (showLabels, pack, shape) = appearance
         LauncherConfig(
             columns = columns.coerceIn(1, 12),
             rows = rows.coerceIn(1, 12),

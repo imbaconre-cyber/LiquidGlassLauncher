@@ -3,7 +3,6 @@ package com.liquidglass.launcher.ui.glass
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.align
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -44,7 +43,7 @@ fun AppIcon(
     ) {
         if (imageBitmap != null) {
             Image(
-                imageBitmap = imageBitmap,
+                bitmap = imageBitmap,
                 contentDescription = contentDescription,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit

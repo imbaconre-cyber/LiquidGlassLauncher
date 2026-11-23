@@ -5,11 +5,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.preferencesDataStore
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+
+private val Context.launcherDataStore by preferencesDataStore(name = "launcher_settings")
 
 object LauncherSettingsKeys {
     val HOME_COLUMNS = intPreferencesKey("home_columns")
@@ -27,7 +29,7 @@ object LauncherSettingsKeys {
  * Persisted launcher preferences backed by DataStore Preferences.
  */
 class LauncherSettings(private val context: Context) {
-    private val dataStore = preferencesDataStore(context, "launcher_settings")
+    private val dataStore get() = context.launcherDataStore
 
     /* ---------- Home grid ---------- */
     suspend fun setHomeColumns(value: Int) = dataStore.edit { it[LauncherSettingsKeys.HOME_COLUMNS] = value }
@@ -61,7 +63,10 @@ class LauncherSettings(private val context: Context) {
     val dockEnabledFlow: Flow<Boolean> = dataStore.data.map { it[LauncherSettingsKeys.DOCK_ENABLED] ?: true }
 
     /* ---------- Icon pack / shape ---------- */
-    suspend fun setSelectedIconPack(value: String?) = dataStore.edit { it[LauncherSettingsKeys.SELECTED_ICON_PACK] = value }
+    suspend fun setSelectedIconPack(value: String?) = dataStore.edit { prefs ->
+        if (value == null) prefs.remove(LauncherSettingsKeys.SELECTED_ICON_PACK)
+        else prefs[LauncherSettingsKeys.SELECTED_ICON_PACK] = value
+    }
     suspend fun getSelectedIconPack(): String? = dataStore.data.first()[LauncherSettingsKeys.SELECTED_ICON_PACK]
     val selectedIconPackFlow: Flow<String?> = dataStore.data.map { it[LauncherSettingsKeys.SELECTED_ICON_PACK] }
 

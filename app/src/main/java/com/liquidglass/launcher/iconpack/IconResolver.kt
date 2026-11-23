@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import com.liquidglass.launcher.data.db.IconOverrideEntity
 import com.liquidglass.launcher.ui.home.AppInfo
 
@@ -85,7 +86,7 @@ object IconResolver {
     }
 
     fun drawableToImageBitmap(drawable: Drawable?, sizeDp: Float, density: Float): ImageBitmap? {
-        val sizePx = (sizeDp * density).coerceAtLeast(1).toInt()
-        return drawableToBitmap(drawable, sizePx)?.let { ImageBitmap.imageBitmap(it) }
+        val sizePx = (sizeDp * density).coerceAtLeast(1f).toInt()
+        return drawableToBitmap(drawable, sizePx)?.asImageBitmap()
     }
 }

@@ -1,11 +1,13 @@
 package com.liquidglass.launcher.ui.glass
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.longClickable
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -28,7 +31,7 @@ import com.liquidglass.launcher.ui.home.AppInfo
  */
 @Composable
 fun FossifyLiquidDock(
-    backdrop: Backdrop?,
+    backdrop: Backdrop,
     apps: List<AppInfo>,
     iconFor: (AppInfo) -> ImageBitmap?,
     onAppClick: (AppInfo) -> Unit,
@@ -64,9 +67,10 @@ fun FossifyLiquidDock(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FossifyLiquidDockItem(
-    backdrop: Backdrop?,
+    backdrop: Backdrop,
     app: AppInfo,
     iconFor: (AppInfo) -> ImageBitmap?,
     onClick: () -> Unit,
@@ -78,7 +82,10 @@ private fun FossifyLiquidDockItem(
 ) {
     val image = iconFor(app)
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
+    ) {
         GlassSurface(
             backdrop = backdrop,
             shape = RoundedCornerShape(20.dp),
@@ -101,9 +108,7 @@ private fun FossifyLiquidDockItem(
             fontSize = labelFontSize,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
     }
-    .clickable { onClick() }
-    .longClickable { onLongClick?.invoke(); true }
 }

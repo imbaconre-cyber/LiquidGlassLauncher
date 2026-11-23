@@ -1,11 +1,13 @@
 package com.liquidglass.launcher.ui.glass
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.draggable.detectDragGestures
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -17,11 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.FloatRange
 import androidx.compose.ui.unit.dp
 import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.drawBackdrop
@@ -36,7 +37,6 @@ import com.kyant.backdrop.effects.vibrancy
  * When [backdrop] is null (e.g. used outside a layer-backed hierarchy) it falls back to a solid
  * colored track so the component still renders correctly.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FossifyLiquidSlider(
     value: Float,
@@ -44,7 +44,7 @@ fun FossifyLiquidSlider(
     onValueChangeFinished: ((Float) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    valueRange: FloatRange = 0f..1f,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     trackHeight: Dp = 4.dp,
     activeTrackHeight: Dp = 6.dp,
     thumbSize: Dp = 20.dp,
@@ -56,7 +56,7 @@ fun FossifyLiquidSlider(
     label: @Composable (() -> Unit)? = null
 ) {
     val density = LocalDensity.current
-    val thumbPx = thumbSize.toPx(density)
+    val thumbPx = with(density) { thumbSize.toPx() }
     val halfThumb = thumbPx / 2f
 
     val trackWidth = remember { mutableFloatStateOf(0f) }
@@ -91,20 +91,18 @@ fun FossifyLiquidSlider(
         modifier = modifier
             .fillMaxWidth()
             .height(thumbSize)
-            .pointerInput(Unit, enabled, value, valueRange) {
+            .pointerInput(Unit) {
                 detectDragGestures(
-                    onDragStart = { _, _ -> },
                     onDrag = { change, dragAmount ->
                         if (!enabled) return@detectDragGestures
                         val width = trackWidth.value
                         if (width <= thumbPx) return@detectDragGestures
-                        change.consumePositionChange()
-                        var newOffset = thumbOffset.value + dragAmount.x
-                        newOffset = newOffset.coerceIn(halfThumb, width - halfThumb)
+                        change.consume()
+                        val newOffset = (thumbOffset.value + dragAmount.x).coerceIn(halfThumb, width - halfThumb)
                         thumbOffset.value = newOffset
                         onValueChangeState.value?.invoke(mapPxToValue(newOffset, width))
                     },
-                    onDragEnd = { _ ->
+                    onDragEnd = {
                         if (!enabled) return@detectDragGestures
                         val width = trackWidth.value
                         if (width <= thumbPx) return@detectDragGestures
@@ -152,7 +150,7 @@ fun FossifyLiquidSlider(
         // Active (filled) portion
         Box(
             modifier = Modifier
-                .width(activeWidth.dp)
+                .width(with(density) { activeWidth.toDp() })
                 .height(activeTrackHeight)
                 .align(Alignment.CenterVertically)
                 .background(activeTrackColor, RoundedCornerShape(activeTrackHeight))
@@ -162,7 +160,7 @@ fun FossifyLiquidSlider(
         Box(
             modifier = Modifier
                 .size(thumbSize)
-                .offset(x = (thumbOffset.value - halfThumb).dp, y = 0.dp)
+                .offset(x = with(density) { (thumbOffset.value - halfThumb).toDp() }, y = 0.dp)
                 .background(thumbColor, CircleShape)
                 .clip(CircleShape)
         )

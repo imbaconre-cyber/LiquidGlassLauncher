@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +76,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                val pageItems by viewModel.observePage(page).collectAsState()
+                val pageItems by viewModel.observePage(page).collectAsState(initial = emptyList())
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(config.columns.coerceAtLeast(1)),
                     modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -96,18 +97,21 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                     GlassFolder(
                                         backdrop = backdrop,
                                         apps = folderAppsState.value,
-                                        iconFor = { app -> appIconBitmap(viewModel, app, 30f, density) },
+                                        iconFor = { app -> appIconBitmap(viewModel, app, 30f, density.density) },
                                         onAppClick = { app -> viewModel.launch(app) },
                                         size = iconSize,
-                                        iconSize = (iconSize.toPx(density) * 0.6f).dp,
+                                        iconSize = iconSize * 0.6f,
                                         shape = config.iconShape
                                     )
                                 }
                             }
                             "app" -> {
                                 viewModel.appInfoFor(item)?.let { app ->
-                                    val bitmap = appIconBitmap(viewModel, app, iconSize.toPx(density).toFloat(), density)
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    val bitmap = appIconBitmap(viewModel, app, with(density) { iconSize.toPx() }, density.density)
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.clickable { viewModel.launch(app) }
+                                    ) {
                                         GlassSurface(
                                             backdrop = backdrop,
                                             shape = config.iconShape.toShape(),
@@ -134,7 +138,6 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                             )
                                         }
                                     }
-                                    .clickable { viewModel.launch(app) }
                                 }
                             }
                             else -> {
@@ -159,7 +162,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 FossifyLiquidDock(
                     backdrop = backdrop,
                     apps = apps.take(config.dockSize.coerceAtLeast(1)),
-                    iconFor = { app -> appIconBitmap(viewModel, app, iconSize.toPx(density).toFloat(), density) },
+                    iconFor = { app -> appIconBitmap(viewModel, app, with(density) { iconSize.toPx() }, density.density) },
                     onAppClick = { app -> viewModel.launch(app) },
                     onAppLongPress = { app -> /* TODO: open edit/rename dialog */ },
                     maxItems = config.dockSize.coerceAtLeast(1),

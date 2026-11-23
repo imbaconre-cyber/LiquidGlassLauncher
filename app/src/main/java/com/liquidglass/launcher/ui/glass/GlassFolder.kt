@@ -1,6 +1,10 @@
 package com.liquidglass.launcher.ui.glass
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -22,7 +26,7 @@ import com.liquidglass.launcher.ui.home.AppInfo
  */
 @Composable
 fun GlassFolder(
-    backdrop: Backdrop?,
+    backdrop: Backdrop,
     apps: List<AppInfo>,
     iconFor: (AppInfo) -> ImageBitmap?,
     onAppClick: (AppInfo) -> Unit,
@@ -45,7 +49,10 @@ fun GlassFolder(
             modifier = Modifier.padding(8.dp)
         ) {
             items(apps) { app ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { onAppClick(app) }
+                ) {
                     AppIcon(
                         imageBitmap = iconFor(app),
                         label = app.label,
@@ -63,7 +70,6 @@ fun GlassFolder(
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
-                .clickable { onAppClick(app) }
             }
         }
     }
@@ -74,7 +80,7 @@ fun GlassFolder(
  */
 @Composable
 fun GlassWidgetBackground(
-    backdrop: Backdrop?,
+    backdrop: Backdrop,
     modifier: Modifier = Modifier,
     shape: androidx.compose.ui.graphics.Shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
     blurRadius: Dp = 10.dp,
